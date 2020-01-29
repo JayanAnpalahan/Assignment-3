@@ -1,0 +1,215 @@
+---
+title: "Data Analysis"
+author: "Jayan Anpalahan"
+date: "January 21, 2020"
+output: html_document
+---
+
+
+###Calling Data and Packages 
+
+
+The "dplyr" package is called upon by the "library" function. "dplyr" provides a set of functions that can be called upon.
+
+The "eval= FALSE" in the R Markdown will allow for a display for the code without running it.
+
+
+```{r, eval=FALSE}
+library("dplyr")
+```
+
+Next, the code is re-ran except with "include=FALSE" added, which runs the code (since it is still needed) but does not show the output, since the output is not relevant for this report.
+
+```{r, include= FALSE}
+library("dplyr")
+```
+
+
+
+The "read.csv" function tells the program what data to work with. 
+
+```{r}
+MData = read.csv("C:/Users/Jayan/Desktop/BIOL432/BIOL432-Assignment-2/Data/measurements.csv")
+```
+
+###Altering Column Names
+
+To alter column names, the function "names" shifts the focus on the column names, so that new names can be set.
+
+The square brackets ("[]") contain the numerical position of what column names that need to be altered.
+
+The equals ("=") sign sets those column names to a new set of concatenated names, corresponding to each position, respectively.
+i.e. the first name in the concatenated list, is "Spc", so it will go in the specified column "2".
+
+```{r}
+names(MData)[c(2,3,4,5,6,7)] = c("Spc", "LWi", "UWi", "LLe", "ULe", "Volume")
+```
+
+###Using "for"" Loops To Change Values Based On Defined Conditions
+
+A "for" is a loop that allows a conditions to be produced repeatedly.
+An "if" checks for TRUE and FALSE conditions before allowing a condition to proceed.
+Together, there is a repetition with a condition, and until that condition is FALSE, then the loop will continue.
+
+The repetition here, happens at the length of the number of rows in "MData", i.e. the loop will repeat something withinthe rows of "MData". To label each row as a unique set, the [i] is used as an indicator.
+
+The "if" condition, checks if the rows ("[i]") have a particular condition within a column, and if it is there, i.e. TRUE, then another column will be changed. The column checked here is the subset of "MData" called "UWi" where the program checks for "cm". Then the column altered is MData$LWi to itself times 10, to convert from centimeters to millimeters.
+
+To stop the condition from repeating, the colum that is checked for TRUE or FALSE is also altered to a new value, otherwise the loop would repeat each time it is run since the conditon remains TRUE. In this case, "UWi" is changed to "mm".
+
+
+```{r}
+for (i in 1:nrow(MData)){
+  if (MData$UWi [i] == "cm") {
+    MData$LWi [i] = (MData$LWi[i]*10)
+    MData$UWi [i] = "mm"}
+}
+```
+
+
+The same process is repeated for the "LLe" and "ULe", being changed if "ULe" meets the defined condition.
+
+
+```{r}
+for (i in 1:nrow(MData)){
+  if (MData$ULe [i] == "cm") {
+    MData$LLe [i] = (MData$LLe[i] *10)
+    MData$ULe [i] = "mm"}
+}
+```
+
+###Plotting
+
+Plotting data starts with calling upon a package called "ggplot2", which has a function that produces a graph based on defined criteria.
+
+The function used to plot, is called "qplot". The defined variables in this case are:
+the axes ("LWi"" vs "LLe""), 
+the data to plot from ("MData"), 
+the shape ("I=21", where "I"" is the indetity of a shape defined by a number "21", which is a filled circle), 
+the colour of the outline of the points (via RGB coordinates, "rgb(0,0,0)" is no colour, so it is black), 
+size of points (size defined by an identity which representes font size),
+fill of the points ("I"" can also be set to names of colours that are within the "ggplot2"" package),
+axes labels ("xlab", and "ylab"),
+limits of the axes ("xlim", and "ylim"), i.e how long they are in the units of the plotted data ("mm"),
+and the overall theme ("theme_classic") with a condition to make the base size higher ("base_size = 20")
+
+```{r}
+library(ggplot2)
+qplot(x=LWi, y=LLe, data=MData, shape=I(21), 
+      colour=I(rgb(0,0,0)),size=I(3), fill=I("red"), 
+      xlab = "Limb Width (mm)", 
+      ylab = "Limb Length (mm)",
+      ylim = c(0,2000),
+      xlim = c(0,300)) + theme_classic(base_size = 15)
+```
+
+###Selecting particular subsets of data and plotting them.
+
+Here, the "mean" function takes the mean of the values within. In this case, the subset of "MData" called "Volume" haits mean set to a variable called "MeanVol".
+
+Then, "AboveAv" can be set to another subset of "MData", except it will only have the values where the "Volume" is greater than or equal to "MeanVol", i.e "AboveAv" is the volume data that is higher than the mean volume.
+
+
+```{r}
+MeanVol = mean(MData$Volume)
+
+AboveAv = subset(MData, Volume >= MeanVol)
+```
+
+
+This "AboveAv" data can also be the data that "qplot" can pull its data from, and plot. 
+The limits of the axes are the same as the above data with all points, in order to visualize the removal of points where the volume is not above average.
+
+
+```{r}
+qplot(x=LWi, y=LLe, data=AboveAv, shape=I(21), 
+      colour=I(rgb(0,0,0)),size=I(3), fill=I("red"), 
+      xlab = "Limb Width (mm)", 
+      ylab = "Limb Length (mm)",
+      ylim = c(0,2000),
+      xlim = c(0,300)) + theme_classic(base_size = 15)
+```
+
+
+###Tables using only specified columns.
+
+To begin, the data of interest is the data in "MData" where the "Volume" is below the average.
+
+So, "BelowAv" is assigned to a subset of "MData" where the "Volume" is less than or equal to "MeanVol" (from above).
+
+Then, "SpcOnly" is assigned to a "select" function, which basically chooses columns from a defined data set.
+
+In this case, we "select" in the dataset "BelowAv", the columns called "Spc" and "Volume".
+
+
+```{r}
+BelowAv = subset(MData, Volume <= MeanVol)
+
+SpcOnly = select(BelowAv, Spc, Volume)
+```
+
+Now, to make the tables, there a more visually appealing function called "kable" but it requires the calling of the packe "knitr".
+
+"kable" will print the defined data set along with a caption above the figure (" caption = "YourCaptionHere" ")
+
+
+```{r}
+library(knitr)
+
+kable (SpcOnly, caption = "Species With a Below Average Volume")
+
+```
+
+###Summarizing Data of Groups
+
+To begin, an arbitrarily selected number of rows, and all columns, in "MData" had their column and row address assigned to the variable "Group1" and "Group2".
+
+
+```{r}
+Group1 = MData[1:5,1:7]
+
+
+Group2 = MData[6:10,1:7]
+```
+
+Next two new variables called "Group1summary" and "Group2summary are assigned the "summarize" data of "Group1" and "Group2".
+
+The "summarize" function allows the user to take key aspects of data (in this case "Group1" and "Group2"), like the mean (via "mean" function) and standard deviation (via "sd" function) of particular columns, and collect them into a row of data.
+
+The mean and standard of deviation of "Lwi", "LLe", and "Volume" within the data of "Group1" and "Group2" are assigned to "Group1summary" and "Group2summary", respectively.
+
+```{r}
+Group1summary = summarize(Group1, "Mean Width" = mean(LWi),
+          "SD of Width" = sd(LWi),
+          "Mean Length" = mean(LLe),
+          "SD of Width" = sd(LLe),
+          "Mean Volume" = mean(Volume),
+          "SD of Volume" = sd(Volume))
+
+Group2summary = summarize(Group2, "Mean Width" = mean(LWi),
+          "SD of Width" = sd(LWi),
+          "Mean Length" = mean(LLe),
+          "SD of Width" = sd(LLe),
+          "Mean Volume" = mean(Volume),
+          "SD of Volume" = sd(Volume))
+```
+
+If we want to combine those two rows of summary data, there is a function called "rbind" which can combine data frames. In this case, "GroupSummarized" is assigned to the combination of "Group1Summary" and "Group2summary".
+
+Within the "rbind" command, there is a "row.names" command which allows for the row names to be displayed. 
+
+Note that this is not suffcient information, as the rows will simply be called numerical values (i.e. "1" and "2"). 
+
+The next step is defining the row names. This is similar to changing the column names, except the function "rownames" is used on the data set of interest. In this case, the data set "GroupsSummarized" has it's "rownames" defined by the concatenated strings "Group 1 Summary" and "Group 2 Summary". 
+
+```{r}
+GroupsSummarized = rbind(Group1summary,Group2summary, row.names(TRUE))
+
+rownames(GroupsSummarized) = c("Group 1 Summary", "Group 2 Summary")
+```
+
+Next, the "kable" makes a table with these values, and maintains that "row.names" is "TRUE", meaning to display them.
+
+```{r}
+kable(GroupsSummarized, caption = "Summary of Groups", row.names = TRUE)
+```
