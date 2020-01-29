@@ -1,0 +1,108 @@
+---
+title: "Regex Code and Output for Assignment 3"
+author: "Jayan Anpalahan"
+date: "January 27, 2020"
+output: html_document
+---
+
+## Calling My Data
+
+Using the "read.csv" function to call upon the "measurements.csv" file, and setting that data to a variable called MData.
+
+
+```{r}
+MData = read.csv("C:/Users/Jayan/Desktop/BIOL432/BIOL432-Assignment-2/Data/measurements.csv")
+```
+
+## Calling Functions Needed
+
+"library" will call upon the functions within the package specified in quotations ("PackageYouWant")
+
+```{r}
+library("dplyr")
+```
+
+## Using Regex (Regular Expression) Functions To Edit Data
+
+The goal is to create a column called "Sp" which contains the data within the column "Species", except where the first word, which in this case is the Genus, is to be shortened to just the first letter and a period (".").
+
+Since we want to add this to our existing data frame (MData), we start by setting the data frame (MData) to equal something.
+
+Next, we need a new column. So "mutate" can be used to create a new column which contains values based on given criteria.
+
+We will mutate "MData" to create "Sp"
+
+Now we need to set what "Sp" is equal to.
+
+"Sp" is going to need the Regex function "sub", which will replace aspects of the words contained in "Species". In other words, using "sub" allows us to chop up the words in the column "Species", and replace aspects of these words.
+
+"sub",rather than "gsub", is used because we only want to chop up the first word, not all!
+
+So, we "sub" and then use "(\\w)(\\w+)" which are escape functions that break the first word into components.These components are separated by brackets ("()") and when replaced, they can be called upon by a double-backslash ("\\") and a number corresponding to which component they are.  
+
+These components are:
+
+(\\\w) = \\\1 = First component, and is the first letter in the first word.
+
+(\\\w+)= \\\2 = Second component, and is the rest of the letters in the word.
+
+The "w" means an alphanumeric character. 
+
+We only want the first componenet, which is the first letter in the first word, and we can add what we want to have infront of it. In this case, a period ("."). The last thing in the "sub" function is just what words we are working with. In this case, "Species".
+
+```{r}
+MData = mutate(MData, Sp = sub("(\\w)(\\w+)", "\\1.", Species))
+```
+
+## Table Of One Specified Column Only
+
+To make a table with only one specified column, we need to first create a variable which contains just that one column.
+
+A useful "dplyr" function, is the "select" function. "select" allows the user to pull a specified column out of a data frame.
+
+So we set a new variable "SpOnly" to "select" from the data frame "MData", the column we want which is "Sp".
+
+```{r}
+SpOnly = select(MData, Sp)
+```
+
+Now to make a table (within the knitted html) that looks more delicious than a standard output, we need the package "knitr" to make a table, and "kableExtra" to customize things like the font style (to do italics)
+
+So let us call on it...
+
+
+```{r}
+library(knitr)
+library(kableExtra)
+
+```
+
+The table function is called "kable". "kable" and the data, along with "kable_styling" determining things like:
+whether to use the full width of the page (full_width), 
+what column to modify (column_spec), 
+bold or not (bold), 
+italicized or not (italic), 
+text colour (color), 
+and background colour (background).
+
+Citation: Hao Zhu, 2019.
+
+
+Link: https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html#visualize_data_with_viridis_color
+
+```{r}
+kable (SpOnly) %>%
+  kable_styling(full_width= F) %>%
+  column_spec(1, 
+              bold = T, 
+              italic = T, 
+              color = "black",
+              background = "white"
+              )
+
+```
+
+
+
+
+
