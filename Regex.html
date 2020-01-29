@@ -224,10 +224,18 @@ summary {
 </div>
 <div id="table-of-one-specified-column-only" class="section level2">
 <h2>Table Of One Specified Column Only</h2>
+<div id="only-sp" class="section level3">
+<h3>Only “Sp”</h3>
 <p>To make a table with only one specified column, we need to first create a variable which contains just that one column.</p>
 <p>A useful “dplyr” function, is the “select” function. “select” allows the user to pull a specified column out of a data frame.</p>
 <p>So we set a new variable “SpOnly” to “select” from the data frame “MData”, the column we want which is “Sp”.</p>
 <pre class="r"><code>SpOnly = select(MData, Sp)</code></pre>
+<p>If we wanted to have “Sp” in thespot where “Species” would be but also keeping all other columns, then we also use select but we use “everything()” to keep everything else (all the other columns). Note that “X” is a placeholder for the row number, so it must come before “Sp” to maintian the same order as before our manipulation.</p>
+<p>Here is the code I would use, but I am not running it because we only want “Sp” as the focus column for the purposes of our table further below.</p>
+</div>
+<div id="sp-where-species-was-w-other-columns-kept" class="section level3">
+<h3>“Sp” where “Species was” w/ other columns kept</h3>
+<pre class="r"><code>SpRearrange = select(MData, X, Sp, everything())</code></pre>
 <p>Now to make a table (within the knitted html) that looks more delicious than a standard output, we need the package “knitr” to make a table, and “kableExtra” to customize things like the font style (to do italics)</p>
 <p>So let us call on it…</p>
 <pre class="r"><code>library(knitr)</code></pre>
@@ -311,6 +319,7 @@ C. aegagrus
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 
 

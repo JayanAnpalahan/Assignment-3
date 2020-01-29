@@ -56,15 +56,33 @@ MData = mutate(MData, Sp = sub("(\\w)(\\w+)", "\\1.", Species))
 
 ## Table Of One Specified Column Only
 
+### Only "Sp"
 To make a table with only one specified column, we need to first create a variable which contains just that one column.
 
 A useful "dplyr" function, is the "select" function. "select" allows the user to pull a specified column out of a data frame.
+
 
 So we set a new variable "SpOnly" to "select" from the data frame "MData", the column we want which is "Sp".
 
 ```{r}
 SpOnly = select(MData, Sp)
 ```
+
+
+If we wanted to have "Sp" in thespot where "Species" would be but also keeping all other columns, then we also use select but we use "everything()" to keep everything else (all the other columns). Note that "X" is a placeholder for the row number, so it must come before "Sp" to maintian the same order as before our manipulation.
+
+Here is the code I would use, but I am not running it because we only want "Sp" as the focus column for the purposes of our table further below.
+
+### "Sp" where "Species was" w/ other columns kept
+
+```{r eval = FALSE}
+SpRearrange = select(MData, X, Sp, everything())
+
+```
+
+
+
+
 
 Now to make a table (within the knitted html) that looks more delicious than a standard output, we need the package "knitr" to make a table, and "kableExtra" to customize things like the font style (to do italics)
 
